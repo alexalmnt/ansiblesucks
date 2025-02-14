@@ -1,0 +1,8 @@
+- name: Install Packages
+  hosts: my_servers 
+  become: yes
+  tasks:
+    - name: Install required packages
+      yum:
+        name: git
+        state: present
