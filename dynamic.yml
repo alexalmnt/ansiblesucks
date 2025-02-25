@@ -1,0 +1,33 @@
+---
+- name: Dynamically install and start a service
+  hosts: all
+  become: yes
+  vars:
+    service_name: "{{ 'httpd' if ansible_os_family == 'RedHat' else 'apache2' }}"
+  tasks:
+    - name: gather system facts
+      ansible.builtin.setup:
+    
+    - name: set package manager based on OS 
+      set_fact:
+        package_manager: "{{ 'yum' if ansible_os_family == 'RedHat' else 'apt' }}"
+      
+    - name: install the service based on OS
+      yum:
+        name: "{{ service_name }}"
+        state: present
+      when: ansible_os_family == 'RedHat'
+
+    
+    - name: Install the service (Debian-based)
+      apt:
+        name: "{{ service_name }}"
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: start and enable service
+      service:
+        name: "{{ service_name }}"
+        state: started
+        enabled: yes

@@ -1,0 +1,9 @@
+---
+- name: install htop on my server
+  hosts: all
+  become: yes
+  tasks:
+    - name: htop install
+      yum:
+        name: htop
+        state: present

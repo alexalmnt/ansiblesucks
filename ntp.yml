@@ -1,0 +1,14 @@
+---
+- name: Install NTP across all my servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: install ntp
+      yum:
+        name: chrony
+        state: present
+    - name: start and enable ntp
+      service:
+        name: chronyd
+        state: started
+        enabled: yes

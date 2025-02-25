@@ -1,0 +1,28 @@
+---
+- name: dynamic playbook that creates a user and sets up ssh keys
+  hosts: all
+  become: yes
+  vars:
+    new_user: deploy
+    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDiS8lnefuh7sOFXA6sCzWBEUviBkwOtpvvi2V+iplDgDOQjoiQeRfnaGbIEXTEdQTjNX4swAkCGi7OHuo8mQrr5t8n9cqRsr0hFPecljrmZ9Z9i9VLc5oPFzT03H41JA7PUBYgZxIoRvSvR7Q1cui71SGRL8wBcU/uz2ZWlUEKCog/5hj9wVB1wBwVgICvY6QreBkOEfBOJBE5Iz2Zkve+IRND/9UAX3sF7eJoCzJzBDYUfbpqTPPdxRAaEDzhs12mcIRR9xvC8DVJ2CvUdxODRnTj6iu4chdMRvRzw0nrgjpNGahH/J7NDBA0DqjzlO5+GBtFnmqQqehbFI3FHR2ZgygTWn1typU4b4Vza3icHUFjDUBzzqS9k89DeL2AxDx2dC5j5tCfjv48YcAjyTrCNCEit4g89GNrePp27AajYc8xvBmfMMwd8YORCqqz0Uz3vL+UfJ4mF6sPSrT5K16TvGb4Q/Jc4dMpaSoirOxSejt47VeeOTokgfwUlvcegLc= ec2-user@ip-172-31-92-79.ec2.internal"
+  tasks:
+    - name: Gather System Facts
+      setup:
+    
+    - name: set user group based on OS
+      set_fact:
+        user_group: "{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"
+    
+    - name: create the user
+      user:
+        name: "{{ new_user }}"
+        state: present
+        groups: "{{ user_group }}"
+        append: yes
+        shell: /bin/bash
+    
+    - name: setup ssh key for new user
+      authorized_key:
+        user: "{{ new_user }}"
+        key: "{{ ssh_key }}"
+        state: present
